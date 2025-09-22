@@ -8,33 +8,6 @@ function buildJourneys(zs: readonly Zone[]): JourneyPath[] {
     return paths;
 }
 
-function deriveOffPeak(): HourSlots {
-    const fullDay = { start: "00:00", end: "23:59" };
-  
-    const buildOffPeak = (slots: TimeRange[]) => {
-      const result: TimeRange[] = [];
-      let cursor = fullDay.start;
-  
-      for (const slot of slots) {
-        if (cursor < slot.start) {
-          result.push({ start: cursor, end: slot.start });
-        }
-        cursor = slot.end;
-      }
-  
-      if (cursor < fullDay.end) {
-        result.push({ start: cursor, end: fullDay.end });
-      }
-  
-      return result;
-    };
-  
-    return {
-      weekday_slots: buildOffPeak(PEAK_HOUR_SLOTS.weekday_slots),
-      weekend_slots: buildOffPeak(PEAK_HOUR_SLOTS.weekend_slots)
-    };
-}
-
 function timeToMinutes(time: string): number {
     const [hours, minutes] = time.split(":").map(Number);
     return (hours * 60) + minutes;
@@ -70,9 +43,6 @@ const PEAK_HOUR_SLOTS: HourSlots = {
     weekday_slots: [{ start: "07:00", end: "10:30" }, { start: "17:00", end: "20:00" }],
     weekend_slots: [{ start: "09:00", end: "11:00" }, { start: "18:00", end: "22:00" }]
 } as const;
-  
-const OFF_PEAK_HOUR_SLOTS = deriveOffPeak();
-
 interface PeakAndOffPeakRules {
     isWeekday(day: Day): day is Weekday;
     isWeekend(day: Day): day is Weekend;
@@ -112,10 +82,13 @@ class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules 
     private journeyTime!: number;
     private fromZone!: Zone;
     private toZone!: Zone;
-    public dayWiseFare!: {Day: number};
+    private weekWiseFare: number;
+    public dayWiseFare: Partial<Record<Day, number>>;
 
     constructor() {
         super();
+        this.weekWiseFare = 0;
+        this.dayWiseFare = {};
     }
 
     isWeekday(day: Day): day is Weekday {
@@ -144,6 +117,9 @@ class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules 
         this.journeyTime = timeToMinutes(details.time);
         this.fromZone = details.fromZone;
         this.toZone = details.toZone;
+        if (!(this.journeyDay in this.dayWiseFare)) {
+            this.dayWiseFare[this.journeyDay] = 0;
+        }
     }
 
     getSingleJourneyFare(): number {
@@ -159,22 +135,28 @@ class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules 
 
     calculateFareForTheDay(details: JourneyDetails): void {
         this.setJourneyDetails(details);
-        if (!(this.journeyDay in this.dayWiseFare)) {
-            this.dayWiseFare[this.journeyDay] = 0;
-        }
         let fare = this.getSingleJourneyFare();
+        const currentDayFare = this.dayWiseFare[this.journeyDay] ?? 0;
         const costCapData = this.getZonalCostCap(`${this.fromZone}-${this.toZone}`);
-        if (this.dayWiseFare[this.journeyDay] + fare >= costCapData.daily) {
-            //dail cost cap reached
-            fare = costCapData.daily - this.dayWiseFare[this.journeyDay];
-        }
-        this.dayWiseFare[this.journeyDay] += fare;
-    }
+        const remainingWeekly = costCapData.weekly - this.weekWiseFare;
+        const remainingDaily = costCapData.daily - currentDayFare;
 
+        fare = Math.min(fare, remainingWeekly, remainingDaily);
+        
+        this.dayWiseFare[this.journeyDay] = currentDayFare + fare;
+        this.weekWiseFare += fare;
+    }
 }
 
 
-let userData = []; //data from file
+let userData: JourneyDetails[] = [
+    {
+        "day": "Monday",
+        "time": "10:20",
+        "fromZone": 2,
+        "toZone": 1
+    }
+]; //data from file
 const journey = new JourneyFareCalculation();
 
 userData.map((row) => {
@@ -183,5 +165,5 @@ userData.map((row) => {
 
 const allDays: Day[] = [...weekdays, ...weekends];
 for (const d of allDays) {
-    console.log(`Day fare: ${journey.dayWiseFare[d]}\n`);
+    console.log(`Day fare for ${d}: ${journey.dayWiseFare[d] ?? 0}\n`);
 }
