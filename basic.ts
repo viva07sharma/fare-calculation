@@ -1,13 +1,3 @@
-function buildJourneys(zs: readonly Zone[]): JourneyPath[] {
-    const paths: JourneyPath[] = [];
-    for (const from of zs) {
-      for (const to of zs) {
-        paths.push([from, to]);
-      }
-    }
-    return paths;
-}
-
 function timeToMinutes(time: string): number {
     const [hours, minutes] = time.split(":").map(Number);
     return (hours * 60) + minutes;
@@ -24,8 +14,6 @@ type TimeRange = { start: string; end: string; };
 const zones = [1, 2] as const;
 type ZoneKey = `${Zone}-${Zone}`;
 type Zone = typeof zones[number];
-type JourneyPath = [Zone, Zone];
-const validJourneys = buildJourneys(zones);
 
 type ZoneCost = { peakCost: number; offPeakCost: number; };
 type CostCap = {daily: number; weekly: number;}
@@ -43,6 +31,7 @@ const PEAK_HOUR_SLOTS: HourSlots = {
     weekday_slots: [{ start: "07:00", end: "10:30" }, { start: "17:00", end: "20:00" }],
     weekend_slots: [{ start: "09:00", end: "11:00" }, { start: "18:00", end: "22:00" }]
 } as const;
+
 interface PeakAndOffPeakRules {
     isWeekday(day: Day): day is Weekday;
     isWeekend(day: Day): day is Weekend;
@@ -82,7 +71,7 @@ class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules 
     private journeyTime!: number;
     private fromZone!: Zone;
     private toZone!: Zone;
-    private weekWiseFare: number;
+    public weekWiseFare: number;
     public dayWiseFare: Partial<Record<Day, number>>;
 
     constructor() {
