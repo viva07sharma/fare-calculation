@@ -8,7 +8,7 @@ const weekends = ["Saturday", "Sunday"] as const;
 
 type Weekday = typeof weekdays[number];
 type Weekend = typeof weekends[number];
-type Day = Weekday | Weekend;
+export type Day = Weekday | Weekend;
 type TimeRange = { start: string; end: string; };
 
 const zones = [1, 2] as const;
@@ -19,7 +19,7 @@ type ZoneCost = { peakCost: number; offPeakCost: number; };
 type CostCap = {daily: number; weekly: number;}
 type TripCost = Record<ZoneKey, ZoneCost>;
 type ZonalCappingLimits = Record<ZoneKey, CostCap>;
-type JourneyDetails = {
+export type JourneyDetails = {
     day: Day;
     time: string;
     fromZone: Zone;
@@ -160,29 +160,8 @@ class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules 
     }
 }
 
-let userData: JourneyDetails[] = [
-    {
-        "day": "Monday",
-        "time": "10:20",
-        "fromZone": 2,
-        "toZone": 1
-    },
-    {
-        "day": "Tuesday",
-        "time": "08:20",
-        "fromZone": 2,
-        "toZone": 1
-    }
-]; //data from file
-const journey = new JourneyFareCalculation();
-
-userData.map((row) => {
-    journey.calculateFareForTheDay(row);
-});
-
-const allDays: Day[] = [...weekdays, ...weekends];
-for (const d of allDays) {
-    console.log(`Day fare for ${d}: ${journey.dayWiseFare[d] ?? 0}\n`);
+export function runJourneyCalculation(userData: JourneyDetails[]) {
+    const journey = new JourneyFareCalculation();
+    userData.forEach(j => journey.calculateFareForTheDay(j));
+    return journey;
 }
-
-console.log(journey.getResults());
