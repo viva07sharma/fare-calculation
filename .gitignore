@@ -11,7 +11,7 @@ yarn-error.log*
 # TypeScript compiled output
 dist/
 build/
-*.js
+#*.js
 *.js.map
 
 # Optional IDE/editor files
