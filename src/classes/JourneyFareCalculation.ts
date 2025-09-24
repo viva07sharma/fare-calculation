@@ -4,7 +4,12 @@ import { PEAK_HOUR_SLOTS } from "../constants/peakHours";
 import { timeToMinutes } from "../utils/time";
 import { ZoneCosting } from "./ZoneCosting";
 
-
+/**
+ * JourneyFareCalculation handles fare computation for journeys
+ * including peak/off-peak calculation, daily and weekly capping.
+ * Extends ZoneCosting for trip costs and caps.
+ * Implements PeakAndOffPeakRules to determine peak/off-peak times.
+ */
 export default class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules {
     private journeyDay!: Day;
     private journeyTime!: number;
@@ -16,6 +21,10 @@ export default class JourneyFareCalculation extends ZoneCosting implements PeakA
     private resultByWeek: Record<number, {weekFare: number, dayFare: Partial<Record<Day, number>> }>;
     private previousDay?: Day;
 
+    /**
+     * Initializes a new JourneyFareCalculation instance
+     * calls the ZoneCosting constructor, sets initial fare values
+     */
     constructor() {
         super();
         this.weekWiseFare = 0;
@@ -24,14 +33,23 @@ export default class JourneyFareCalculation extends ZoneCosting implements PeakA
         this.resultByWeek = {1:{weekFare: 0, dayFare: {}}};
     }
 
+    /**
+     * @returns true if day is Weekday, false otherwise
+     */
     isWeekday(day: Day): day is Weekday {
         return weekdays.some(weekday => weekday === day);
     }
 
+    /**
+     * @returns true if day is Weekend, false otherwise
+     */
     isWeekend(day: Day): day is Weekend {
         return weekends.some(weekend => weekend === day);
     }
 
+    /**
+     * @returns true if this.journeyTime is withing peak timings or false otherwise
+     */
     private isTimePeak(): boolean {
         let slots: TimeRange[];
 
@@ -45,6 +63,9 @@ export default class JourneyFareCalculation extends ZoneCosting implements PeakA
 
     }
 
+    /**
+     * set initial values of journey based on the given record of type JourneyDetails
+     */
     private setJourneyDetails(details: JourneyDetails): void {
         this.journeyDay = details.day;
         this.journeyTime = timeToMinutes(details.time);
@@ -55,6 +76,10 @@ export default class JourneyFareCalculation extends ZoneCosting implements PeakA
         }
     }
 
+    /**
+     * get fare based on the set JourneyDetails based on cost by zones + peak/offPeak timings
+     * @returns peak or offPeak cost
+     */
     private getSingleJourneyFare(): number {
         const cost = this.getTripCostByZones(`${this.fromZone}-${this.toZone}`);
         //find if peak or off-peak time
@@ -66,6 +91,9 @@ export default class JourneyFareCalculation extends ZoneCosting implements PeakA
         }
     }
 
+    /*
+    * check if a new week started, if yes re-initialize fare values
+    */
     private checkNewWeek(day: Day) {
         if ((this.previousDay == "Sunday" && day == "Monday")) {
             this.currentWeek++;
@@ -75,7 +103,10 @@ export default class JourneyFareCalculation extends ZoneCosting implements PeakA
         }
     }
 
-    calculateFareForTheDay(details: JourneyDetails): void {
+    /** 
+     * fare calculation by day and week
+    */
+    calculateFareForTheDayandWeek(details: JourneyDetails): void {
         this.checkNewWeek(details.day);
         this.setJourneyDetails(details);
         let fare = this.getSingleJourneyFare();
@@ -94,6 +125,9 @@ export default class JourneyFareCalculation extends ZoneCosting implements PeakA
         this.previousDay = details.day;
     }
 
+    /**
+     * @returns results based on current week
+     */
     getResults() {
         return this.resultByWeek;
     }
