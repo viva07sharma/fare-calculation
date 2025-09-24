@@ -14,8 +14,8 @@ A TypeScript-based library to calculate daily and weekly journey fares with peak
 ## Table of Contents
 
 - [Installation](#installation)
-- [Usage](#usage)
 - [Testing](#testing) 
+- [Usage](#usage)
 
 ---
 
@@ -28,6 +28,18 @@ git clone https://github.com/viva07sharma/fare-calculation.git
 cd fare-calculation
 npm install
 ```
+---
+
+## Testing
+
+- data folder includes test.json and test2.json
+- current test suite utilizes test2.json that is based more closely on the data provided in the original problem
+- hit below after installation to see results
+
+```bash
+npm test
+```
+
 ---
 
 ## Usage
@@ -46,11 +58,4 @@ console.log(journeyCalculator.getResults());
 // {
 //   1: { weekFare: 65, dayFare: { Monday: 65 } }
 // }
-```
----
-
-## Testing
-
-```bash
-npm test
 ```
