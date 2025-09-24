@@ -1,5 +1,13 @@
-import { JourneyDetails, Day } from '../src/types';
+import fs from 'fs';
+import path from 'path';
+import { JourneyDetails } from '../src/types';
 import { runJourneyCalculation } from '../src/index';
+
+/**
+ * Load test json and define testData as array of JourneyDetails
+ */
+const filePath = path.join(__dirname, '../data/test2.json');
+const testData: JourneyDetails[] = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
 describe('JourneyFareCalculation', () => {
   it('charges peak fare within peak slots and off-peak fare otherwise', () => {
@@ -31,6 +39,32 @@ describe('JourneyFareCalculation', () => {
   
     // Zone 1-1 daily cap = 100
     expect(results[1].dayFare["Tuesday"]).toBe(100);
+  });
+
+  it('caps fare at daily limit using test data file (data/test2.json)', () => {
+    const journey = runJourneyCalculation(testData);
+    const results = journey.getResults();
+    console.log(`Weekly fare calculation is:\n${JSON.stringify(results, null, 2)}`);
+
+    // week 1 is the first Monday-Sunday block in testData
+    const week1Results = results[1];
+
+    // check daily fares for specific days
+    expect(week1Results.dayFare["Monday"]).toBeLessThanOrEqual(120); // zone 1-2 daily cap
+    expect(week1Results.dayFare["Tuesday"]).toBeLessThanOrEqual(120); // zone 1-2 daily cap
+  });
+
+  it('caps fare at weekly limit using test data', () => {
+    const journey = runJourneyCalculation(testData);
+    const results = journey.getResults();
+    console.log(`Weekly fare calculation is:\n${JSON.stringify(results, null, 2)}`);
+
+    // week 1 is the first Monday-Sunday block in testData
+    const week1Results = results[1];
+
+    // Zone 1-1 weekly cap = 500, Zone 1-2 weekly cap = 600, Zone 2-1 = 600, 2-2 = 400
+    const maxWeeklyCap = 600; // maximum of all zones in week 1
+    expect(week1Results.weekFare).toBeLessThanOrEqual(maxWeeklyCap);
   });
 
 });

@@ -112,8 +112,8 @@ export default class JourneyFareCalculation extends ZoneCosting implements PeakA
         let fare = this.getSingleJourneyFare();
         const currentDayFare = this.dayWiseFare[this.journeyDay] ?? 0;
         const costCapData = this.getZonalCostCap(`${this.fromZone}-${this.toZone}`);
-        const remainingWeekly = costCapData.weekly - this.weekWiseFare;
-        const remainingDaily = costCapData.daily - currentDayFare;
+        let remainingWeekly = Math.max(costCapData.weekly - this.weekWiseFare, 0);
+        let remainingDaily = Math.max(costCapData.daily - currentDayFare, 0);
 
         fare = Math.min(fare, remainingWeekly, remainingDaily);
         

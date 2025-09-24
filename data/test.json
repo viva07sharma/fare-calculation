@@ -1,0 +1,110 @@
+[
+  {
+    "day": "Monday",
+    "time": "10:45",
+    "fromZone": 1,
+    "toZone": 1
+  },
+  {
+    "day": "Monday",
+    "time": "16:15",
+    "fromZone": 1,
+    "toZone": 1
+  },
+  {
+    "day": "Monday",
+    "time": "18:15",
+    "fromZone": 1,
+    "toZone": 1
+  },
+  {
+    "day": "Tuesday",
+    "time": "08:30",
+    "fromZone": 2,
+    "toZone": 2
+  },
+  {
+    "day": "Tuesday",
+    "time": "17:30",
+    "fromZone": 2,
+    "toZone": 1
+  },
+  {
+    "day": "Tuesday",
+    "time": "18:30",
+    "fromZone": 1,
+    "toZone": 1
+  },
+  {
+    "day": "Wednesday",
+    "time": "09:00",
+    "fromZone": 1,
+    "toZone": 1
+  },
+  {
+    "day": "Wednesday",
+    "time": "18:00",
+    "fromZone": 2,
+    "toZone": 1
+  },
+  {
+    "day": "Thursday",
+    "time": "07:15",
+    "fromZone": 1,
+    "toZone": 2
+  },
+  {
+    "day": "Thursday",
+    "time": "19:45",
+    "fromZone": 2,
+    "toZone": 2
+  },
+  {
+    "day": "Friday",
+    "time": "08:00",
+    "fromZone": 1,
+    "toZone": 1
+  },
+  {
+    "day": "Friday",
+    "time": "20:15",
+    "fromZone": 1,
+    "toZone": 2
+  },
+  {
+    "day": "Saturday",
+    "time": "09:30",
+    "fromZone": 2,
+    "toZone": 1
+  },
+  {
+    "day": "Saturday",
+    "time": "19:00",
+    "fromZone": 1,
+    "toZone": 1
+  },
+  {
+    "day": "Sunday",
+    "time": "10:00",
+    "fromZone": 1,
+    "toZone": 2
+  },
+  {
+    "day": "Sunday",
+    "time": "20:30",
+    "fromZone": 2,
+    "toZone": 2
+  },
+  {
+    "day": "Monday",
+    "time": "08:00",
+    "fromZone": 1,
+    "toZone": 1
+  },
+  {
+    "day": "Tuesday",
+    "time": "09:00",
+    "fromZone": 1,
+    "toZone": 2
+  }
+]
