@@ -7,7 +7,12 @@ import JourneyFareCalculation from "./classes/JourneyFareCalculation";
  * @returns An instance of JourneyFareCalculation containing calculated fares
  */
 export function runJourneyCalculation(userData: JourneyDetails[]) {
-  const journey = new JourneyFareCalculation();
-  userData.forEach((j) => journey.calculateFareForTheDayandWeek(j));
-  return journey;
+    if (!Array.isArray(userData)) {
+        throw new TypeError(
+          `Expected an array of JourneyDetails, but got ${typeof userData}`
+        );
+    }
+    const journey = new JourneyFareCalculation();
+    userData.forEach((j) => journey.calculateFareForTheDayandWeek(j));
+    return journey;
 }
