@@ -13,9 +13,17 @@ A TypeScript-based library to calculate daily and weekly journey fares with peak
 
 ## Table of Contents
 
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Testing](#testing) 
 - [Usage](#usage)
+
+---
+
+## Requirements
+
+- Node.js >= 22.17.0
+- npm >= 10
 
 ---
 
