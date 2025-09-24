@@ -1,4 +1,5 @@
-import { runJourneyCalculation, JourneyDetails, Day } from './../basic';
+import { JourneyDetails, Day } from '../src/types';
+import { runJourneyCalculation } from '../src/index';
 
 describe('JourneyFareCalculation', () => {
   it('charges peak fare within peak slots and off-peak fare otherwise', () => {

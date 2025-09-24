@@ -1,72 +1,11 @@
-function timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(":").map(Number);
-    return (hours * 60) + minutes;
-}  
+import { Day, Weekday, Weekend, TimeRange, Zone, JourneyDetails, weekdays, weekends } from "../types";
+import { PeakAndOffPeakRules } from "../interfaces/PeakAndOffPeakRules";
+import { PEAK_HOUR_SLOTS } from "../constants/peakHours";
+import { timeToMinutes } from "../utils/time";
+import { ZoneCosting } from "./ZoneCosting";
 
-const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"] as const;
-const weekends = ["Saturday", "Sunday"] as const;
 
-type Weekday = typeof weekdays[number];
-type Weekend = typeof weekends[number];
-export type Day = Weekday | Weekend;
-type TimeRange = { start: string; end: string; };
-
-const zones = [1, 2] as const;
-type ZoneKey = `${Zone}-${Zone}`;
-type Zone = typeof zones[number];
-
-type ZoneCost = { peakCost: number; offPeakCost: number; };
-type CostCap = {daily: number; weekly: number;}
-type TripCost = Record<ZoneKey, ZoneCost>;
-type ZonalCappingLimits = Record<ZoneKey, CostCap>;
-export type JourneyDetails = {
-    day: Day;
-    time: string;
-    fromZone: Zone;
-    toZone: Zone;
-};
-
-type HourSlots = { weekday_slots: TimeRange[]; weekend_slots: TimeRange[] };
-const PEAK_HOUR_SLOTS: HourSlots = {
-    weekday_slots: [{ start: "07:00", end: "10:30" }, { start: "17:00", end: "20:00" }],
-    weekend_slots: [{ start: "09:00", end: "11:00" }, { start: "18:00", end: "22:00" }]
-} as const;
-
-interface PeakAndOffPeakRules {
-    isWeekday(day: Day): day is Weekday;
-    isWeekend(day: Day): day is Weekend;
-}
-
-class ZoneCosting {
-    private tripCostByZones: TripCost;
-    private zonalCostCap: ZonalCappingLimits;
-
-    constructor() {
-        this.tripCostByZones = {
-            "1-1": { peakCost: 30, offPeakCost: 25 },
-            "1-2": { peakCost: 35, offPeakCost: 30 },
-            "2-1": { peakCost: 35, offPeakCost: 30 },
-            "2-2": { peakCost: 25, offPeakCost: 20 }
-        };
-
-        this.zonalCostCap = {
-            "1-1": {daily: 100, weekly: 500},
-            "1-2": {daily: 120, weekly: 600},
-            "2-1": {daily: 120, weekly: 600},
-            "2-2": {daily: 80, weekly: 400}
-        }
-    }
-
-    protected getTripCostByZones(zoneKey: ZoneKey): ZoneCost {
-        return this.tripCostByZones[zoneKey];
-    }
-
-    protected getZonalCostCap(zoneKey: ZoneKey): CostCap {
-        return this.zonalCostCap[zoneKey];
-    }
-}
-
-class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules {
+export default class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules {
     private journeyDay!: Day;
     private journeyTime!: number;
     private fromZone!: Zone;
@@ -158,10 +97,4 @@ class JourneyFareCalculation extends ZoneCosting implements PeakAndOffPeakRules 
     getResults() {
         return this.resultByWeek;
     }
-}
-
-export function runJourneyCalculation(userData: JourneyDetails[]) {
-    const journey = new JourneyFareCalculation();
-    userData.forEach(j => journey.calculateFareForTheDay(j));
-    return journey;
 }
