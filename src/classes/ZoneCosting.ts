@@ -5,7 +5,7 @@ import { ZoneKey, ZoneCost, TripCost, CostCap, ZonalCappingLimits } from "../typ
  * tripCostByZones: stores peak and off-peak costs for each zone combination
  * zonalCostCap: stores daily and weekly fare caps for each zone combination
  */
-export class ZoneCosting {
+export abstract class ZoneCosting {
     private tripCostByZones: TripCost;
     private zonalCostCap: ZonalCappingLimits;
 
