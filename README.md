@@ -32,7 +32,7 @@ npm install
 
 ## Testing
 
-- data folder includes test.json and test2.json
+- data folder includes test.json, test2.json and test3.json (test data on a per user basis)
 - current test suite utilizes test2.json that is based more closely on the data provided in the original problem
 - hit below after installation to see results
 
@@ -45,7 +45,8 @@ npm test
 ## Usage
 
 ```ts
-import { runJourneyCalculation, JourneyDetails } from "./src/index";
+import { JourneyDetails, UserJourneyDetails } from '../src/types';
+import { runJourneyCalculation, runJourneyCalculationPerUser } from "./src/index";
 
 const journeys: JourneyDetails[] = [
   { day: "Monday", time: "08:00", fromZone: 1, toZone: 1 },
@@ -58,4 +59,6 @@ console.log(journeyCalculator.getResults());
 // {
 //   1: { weekFare: 65, dayFare: { Monday: 65 } }
 // }
+const journeyCalculatorPerUser = runJourneyCalculationPerUser("uid1", journeys);
+console.log(journeyCalculatorPerUser.getResults());
 ```

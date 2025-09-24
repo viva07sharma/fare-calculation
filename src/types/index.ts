@@ -64,6 +64,11 @@ export type TripCost = Record<ZoneKey, ZoneCost>;
 export type ZonalCappingLimits = Record<ZoneKey, CostCap>;
 
 /**
+ * Type representing weekday and weekend hour slots defined as array of TimeRange type
+ */
+export type HourSlots = { weekday_slots: TimeRange[]; weekend_slots: TimeRange[] };
+
+/**
  * Types representing details of Journey
  */
 export type JourneyDetails = {
@@ -74,6 +79,6 @@ export type JourneyDetails = {
 };
 
 /**
- * Type representing weekday and weekend hour slots defined as array of TimeRange type
+ * Types representing details of Journey per User
  */
-export type HourSlots = { weekday_slots: TimeRange[]; weekend_slots: TimeRange[] };
+export type UserJourneyDetails = Record<string, JourneyDetails[]>;
